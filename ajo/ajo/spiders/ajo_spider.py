@@ -54,16 +54,13 @@ class AjoSpider(scrapy.Spider):
                 request.meta['published'] = published
                 request.meta['title'] = title
                 yield request
-            else:
-                print "*"*50
-                print title
-		
-		
 		
     def parse_abstract_contents1(self, response):
         item = AjoItem()
         #href = response.xpath('//noscript/a/@href').extract()
         abstract = response.xpath('//div[@class="abstract"]//text()').extract()
+        voldate = response.xpath('//div[@class="artBib"]//text()').extract()
+        voldateStr = ' '.join(voldate)
         if	not abstract:
             return
         published = response.meta['published']
@@ -82,7 +79,9 @@ class AjoSpider(scrapy.Spider):
         #fname = fname + '.txt'
         fname = 'test%d.txt'%self.count
         with open(fname, "wb") as f:
-       	    f.write(published[0].encode('utf8'))
+       	    f.write(voldateStr.encode('utf8'))
+       	    f.write('\n'.encode('utf8'))
+       	    f.write(('-'*50).encode('utf8'))
        	    f.write('\n'.encode('utf8'))
             f.write(title[0].encode('utf8'))
             f.write('\n'.encode('utf8'))
@@ -90,6 +89,7 @@ class AjoSpider(scrapy.Spider):
             f.write('\n'.encode('utf8'))
             for i,txt in enumerate(abstract):    
                 f.write(abstract[i].encode('utf8'))
+                f.write('\n'.encode('utf8'))
         f.close()
         os.chdir(origDirectory)
 		
